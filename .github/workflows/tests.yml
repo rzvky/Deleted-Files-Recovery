@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Install test tools
+        run: pip install pytest pyflakes
       - name: Install ntfs-3g
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ntfs-3g
       - name: Build test image
@@ -25,4 +27,4 @@ jobs:
         env:
           NTFS_TEST_DIR: /tmp/ntfs-test
       - name: Lint
-        run: pip install pyflakes && python -m pyflakes ntfs_recover.py tests/
+        run: python -m pyflakes ntfs_recover.py tests/
