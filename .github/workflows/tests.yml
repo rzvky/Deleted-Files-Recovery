@@ -1,0 +1,28 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.8", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install ntfs-3g
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ntfs-3g
+      - name: Build test image
+        run: sudo bash tests/make_image.sh /tmp/ntfs-test && sudo chmod -R a+r /tmp/ntfs-test
+      - name: Run tests
+        run: python -m pytest tests/ -v
+        env:
+          NTFS_TEST_DIR: /tmp/ntfs-test
+      - name: Lint
+        run: pip install pyflakes && python -m pyflakes ntfs_recover.py tests/
